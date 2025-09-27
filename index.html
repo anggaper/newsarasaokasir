@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Kasir Ayam Geprek Sambaku</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #ff6b35, #f7931e, #ffd23f);
+      }
+      .hover-scale {
+        transition: transform 0.2s;
+      }
+      .hover-scale:hover {
+        transform: scale(1.05);
+      }
+      .shadow-custom {
+        box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        .print-area,
+        .print-area * {
+          visibility: visible;
+        }
+        .print-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="gradient-bg shadow-lg">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center space-x-3">
+            <div class="bg-white rounded-full p-2">
+              <span class="text-2xl">🍗</span>
+            </div>
+            <h1 class="text-white text-2xl font-bold">Ayam Geprek Sambaku</h1>
+          </div>
+          <div class="flex space-x-4">
+            <button
+              onclick="showPage('kasir')"
+              class="nav-btn bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all"
+            >
+              Kasir
+            </button>
+            <button
+              onclick="showPage('menu')"
+              class="nav-btn bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all"
+            >
+              Menu
+            </button>
+            <button
+              onclick="showPage('laporan')"
+              class="nav-btn bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all"
+            >
+              Laporan
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Halaman Kasir -->
+    <div
+      id="kasir-page"
+      class="page"
+    >
+      <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Daftar Menu -->
+          <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-custom p-6">
+              <h2 class="text-2xl font-bold text-gray-800 mb-6">Daftar Menu</h2>
+              <div
+                class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                id="menu-list"
+              >
+                <!-- Menu items akan dimuat di sini -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Keranjang & Total -->
+          <div class="space-y-6">
+            <!-- Keranjang -->
+            <div class="bg-white rounded-xl shadow-custom p-6">
+              <h3 class="text-xl font-bold text-gray-800 mb-4">Keranjang Pesanan</h3>
+              <div
+                id="cart-items"
+                class="space-y-3 mb-4"
+              >
+                <p class="text-gray-500 text-center py-8">Keranjang kosong</p>
+              </div>
+              <button
+                onclick="clearCart()"
+                class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Kosongkan Keranjang
+              </button>
+            </div>
+
+            <!-- Total & Pembayaran -->
+            <div class="bg-white rounded-xl shadow-custom p-6">
+              <h3 class="text-xl font-bold text-gray-800 mb-4">Total Pembayaran</h3>
+
+              <div class="space-y-3 mb-4">
+                <div class="flex justify-between">
+                  <span>Subtotal:</span>
+                  <span id="subtotal">Rp 0</span>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                  <label class="text-sm">Diskon (%):</label>
+                  <input
+                    type="number"
+                    id="discount"
+                    min="0"
+                    max="100"
+                    value="0"
+                    class="w-20 px-2 py-1 border rounded"
+                    onchange="calculateTotal()"
+                  />
+                </div>
+
+                <hr class="my-3" />
+                <div class="flex justify-between text-xl font-bold text-orange-600">
+                  <span>Total:</span>
+                  <span id="total">Rp 0</span>
+                </div>
+
+                <hr class="my-3" />
+
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Uang Bayar:</label>
+                    <input
+                      type="text"
+                      id="payment"
+                      class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="Masukkan jumlah uang bayar"
+                      oninput="formatPaymentInput(this)"
+                      onchange="calculateChange()"
+                    />
+                  </div>
+
+                  <div
+                    class="flex justify-between text-lg font-bold"
+                    id="change-display"
+                    style="display: none"
+                  >
+                    <span>Kembalian:</span>
+                    <span
+                      id="change"
+                      class="text-green-600"
+                      >Rp 0</span
+                    >
+                  </div>
+
+                  <div
+                    id="payment-status"
+                    class="text-center text-sm"
+                  ></div>
+                </div>
+              </div>
+
+              <button
+                onclick="finishTransaction()"
+                id="finish-btn"
+                class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover-scale shadow-lg"
+                disabled
+              >
+                Selesai
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Halaman Menu -->
+    <div
+      id="menu-page"
+      class="page hidden"
+    >
+      <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-custom p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Kelola Menu</h2>
+
+          <form
+            id="menu-form"
+            class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
+          >
+            <input
+              type="text"
+              id="menu-name"
+              placeholder="Nama Menu"
+              class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              required
+            />
+            <input
+              type="number"
+              id="menu-price"
+              placeholder="Harga"
+              class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              required
+            />
+            <input
+              type="number"
+              id="menu-stock"
+              placeholder="Stok Awal"
+              class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              required
+              min="0"
+            />
+            <button
+              type="submit"
+              class="gradient-bg text-white py-2 rounded-lg font-semibold hover-scale"
+            >
+              Tambah Menu
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-custom p-6">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">Daftar Menu Tersimpan</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-3">Nama Menu</th>
+                  <th class="text-left py-3">Harga</th>
+                  <th class="text-left py-3">Stok</th>
+                  <th class="text-left py-3">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="menu-table">
+                <!-- Menu items akan dimuat di sini -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Halaman Laporan -->
+    <div
+      id="laporan-page"
+      class="page hidden"
+    >
+      <div class="max-w-6xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Laporan Harian -->
+          <div class="bg-white rounded-xl shadow-custom p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-2xl font-bold text-gray-800">Laporan Harian</h2>
+              <button
+                onclick="resetDailyReport()"
+                class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
+              >
+                Reset Harian
+              </button>
+            </div>
+            <input
+              type="date"
+              id="daily-date"
+              class="mb-4 px-4 py-2 border rounded-lg"
+              onchange="loadDailyReport()"
+            />
+            <div id="daily-report">
+              <p class="text-gray-500 text-center py-8">Pilih tanggal untuk melihat laporan</p>
+            </div>
+          </div>
+
+          <!-- Laporan Bulanan -->
+          <div class="bg-white rounded-xl shadow-custom p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-2xl font-bold text-gray-800">Laporan Bulanan</h2>
+              <button
+                onclick="resetMonthlyReport()"
+                class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
+              >
+                Reset Bulanan
+              </button>
+            </div>
+            <input
+              type="month"
+              id="monthly-date"
+              class="mb-4 px-4 py-2 border rounded-lg"
+              onchange="loadMonthlyReport()"
+            />
+            <div id="monthly-report">
+              <p class="text-gray-500 text-center py-8">Pilih bulan untuk melihat laporan</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Area Print (Hidden) -->
+    <div class="print-area hidden">
+      <div
+        id="receipt-content"
+        class="p-4 max-w-sm mx-auto"
+      >
+        <!-- Konten struk akan dimuat di sini -->
+      </div>
+    </div>
+
+    <script>
+      // Data Storage
+      let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [
+        { id: 1, name: 'Ayam Geprek Original', price: 15000, stock: 60 },
+        { id: 2, name: 'Ayam Geprek Keju', price: 18000, stock: 45 },
+        { id: 3, name: 'Ayam Geprek Sambal Matah', price: 17000, stock: 50 },
+        { id: 4, name: 'Nasi Putih', price: 5000, stock: 100 },
+        { id: 5, name: 'Es Teh Manis', price: 3000, stock: 80 },
+        { id: 6, name: 'Es Jeruk', price: 5000, stock: 70 },
+      ];
+
+      let cart = [];
+      let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+      // Navigation
+      function showPage(pageName) {
+        document.querySelectorAll('.page').forEach((page) => page.classList.add('hidden'));
+        document.getElementById(pageName + '-page').classList.remove('hidden');
+
+        if (pageName === 'kasir') {
+          loadMenuItems();
+        } else if (pageName === 'menu') {
+          loadMenuTable();
+        } else if (pageName === 'laporan') {
+          document.getElementById('daily-date').value = new Date().toISOString().split('T')[0];
+          document.getElementById('monthly-date').value = new Date().toISOString().slice(0, 7);
+          loadDailyReport();
+          loadMonthlyReport();
+        }
+      }
+
+      // Menu Management
+      function loadMenuItems() {
+        const menuList = document.getElementById('menu-list');
+        menuList.innerHTML = '';
+
+        menuItems.forEach((item) => {
+          const menuCard = document.createElement('div');
+          const isOutOfStock = item.stock <= 0;
+          const isLowStock = item.stock <= 10 && item.stock > 0;
+
+          menuCard.className = `bg-gradient-to-r ${isOutOfStock ? 'from-gray-200 to-gray-300' : 'from-orange-100 to-yellow-100'} p-4 rounded-lg border hover-scale cursor-pointer ${isOutOfStock ? 'opacity-60' : ''}`;
+          menuCard.innerHTML = `
+                    <h4 class="font-semibold text-gray-800">${item.name}</h4>
+                    <p class="text-orange-600 font-bold">Rp ${item.price.toLocaleString()}</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-sm ${isOutOfStock ? 'text-red-600 font-bold' : isLowStock ? 'text-yellow-600 font-medium' : 'text-gray-600'}">
+                            ${isOutOfStock ? 'Habis' : `Stok: ${item.stock}`}
+                        </span>
+                        <button onclick="addToCart(${item.id})" 
+                                class="bg-orange-500 text-white px-4 py-1 rounded hover:bg-orange-600 transition-colors ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''}" 
+                                ${isOutOfStock ? 'disabled' : ''}>
+                            Tambah
+                        </button>
+                    </div>
+                `;
+          menuList.appendChild(menuCard);
+        });
+      }
+
+      function loadMenuTable() {
+        const menuTable = document.getElementById('menu-table');
+        menuTable.innerHTML = '';
+
+        menuItems.forEach((item) => {
+          const row = document.createElement('tr');
+          const isLowStock = item.stock <= 10;
+          row.className = 'border-b hover:bg-gray-50';
+          row.innerHTML = `
+                    <td class="py-3">${item.name}</td>
+                    <td class="py-3">Rp ${item.price.toLocaleString()}</td>
+                    <td class="py-3">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeStock(${item.id}, -1)" class="bg-red-500 text-white w-6 h-6 rounded text-sm hover:bg-red-600">-</button>
+                            <span class="w-12 text-center font-medium ${isLowStock ? 'text-red-600' : 'text-gray-800'}">${item.stock}</span>
+                            <button onclick="changeStock(${item.id}, 1)" class="bg-green-500 text-white w-6 h-6 rounded text-sm hover:bg-green-600">+</button>
+                        </div>
+                    </td>
+                    <td class="py-3">
+                        <button onclick="deleteMenuItem(${item.id})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors">Hapus</button>
+                    </td>
+                `;
+          menuTable.appendChild(row);
+        });
+      }
+
+      document.getElementById('menu-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = document.getElementById('menu-name').value;
+        const price = parseInt(document.getElementById('menu-price').value);
+        const stock = parseInt(document.getElementById('menu-stock').value);
+
+        const newItem = {
+          id: Date.now(),
+          name: name,
+          price: price,
+          stock: stock,
+        };
+
+        menuItems.push(newItem);
+        localStorage.setItem('menuItems', JSON.stringify(menuItems));
+
+        document.getElementById('menu-form').reset();
+        loadMenuTable();
+      });
+
+      function deleteMenuItem(id) {
+        menuItems = menuItems.filter((item) => item.id !== id);
+        localStorage.setItem('menuItems', JSON.stringify(menuItems));
+        loadMenuTable();
+      }
+
+      function changeStock(itemId, change) {
+        const item = menuItems.find((m) => m.id === itemId);
+        if (item) {
+          item.stock = Math.max(0, item.stock + change);
+          localStorage.setItem('menuItems', JSON.stringify(menuItems));
+          loadMenuTable();
+          // Refresh kasir page if currently viewing it
+          if (!document.getElementById('kasir-page').classList.contains('hidden')) {
+            loadMenuItems();
+          }
+        }
+      }
+
+      // Cart Management
+      function addToCart(itemId) {
+        const item = menuItems.find((m) => m.id === itemId);
+        if (!item || item.stock <= 0) {
+          alert('Maaf, stok produk ini sudah habis!');
+          return;
+        }
+
+        const existingItem = cart.find((c) => c.id === itemId);
+        const currentCartQuantity = existingItem ? existingItem.quantity : 0;
+
+        if (currentCartQuantity >= item.stock) {
+          alert(`Maaf, stok ${item.name} hanya tersisa ${item.stock} buah!`);
+          return;
+        }
+
+        if (existingItem) {
+          existingItem.quantity += 1;
+        } else {
+          cart.push({ ...item, quantity: 1 });
+        }
+
+        updateCartDisplay();
+        calculateTotal();
+      }
+
+      function updateCartDisplay() {
+        const cartItems = document.getElementById('cart-items');
+
+        if (cart.length === 0) {
+          cartItems.innerHTML = '<p class="text-gray-500 text-center py-8">Keranjang kosong</p>';
+          return;
+        }
+
+        cartItems.innerHTML = '';
+        cart.forEach((item) => {
+          const cartItem = document.createElement('div');
+          cartItem.className = 'flex justify-between items-center bg-gray-50 p-3 rounded';
+          cartItem.innerHTML = `
+                    <div>
+                        <h5 class="font-medium">${item.name}</h5>
+                        <p class="text-sm text-gray-600">Rp ${item.price.toLocaleString()} x ${item.quantity}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeQuantity(${item.id}, -1)" class="bg-red-500 text-white w-6 h-6 rounded text-sm">-</button>
+                        <span class="w-8 text-center">${item.quantity}</span>
+                        <button onclick="changeQuantity(${item.id}, 1)" class="bg-green-500 text-white w-6 h-6 rounded text-sm">+</button>
+                    </div>
+                `;
+          cartItems.appendChild(cartItem);
+        });
+      }
+
+      function changeQuantity(itemId, change) {
+        const cartItem = cart.find((c) => c.id === itemId);
+        const menuItem = menuItems.find((m) => m.id === itemId);
+
+        if (cartItem) {
+          const newQuantity = cartItem.quantity + change;
+
+          if (newQuantity <= 0) {
+            cart = cart.filter((c) => c.id !== itemId);
+          } else if (newQuantity > menuItem.stock) {
+            alert(`Maaf, stok ${menuItem.name} hanya tersisa ${menuItem.stock} buah!`);
+            return;
+          } else {
+            cartItem.quantity = newQuantity;
+          }
+        }
+        updateCartDisplay();
+        calculateTotal();
+      }
+
+      function clearCart() {
+        cart = [];
+        updateCartDisplay();
+        calculateTotal();
+      }
+
+      function calculateTotal() {
+        const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+        const discountAmount = subtotal * (discount / 100);
+        const total = subtotal - discountAmount;
+
+        document.getElementById('subtotal').textContent = `Rp ${subtotal.toLocaleString()}`;
+        document.getElementById('total').textContent = `Rp ${Math.round(total).toLocaleString()}`;
+
+        // Reset payment and change when total changes
+        document.getElementById('payment').value = '';
+        document.getElementById('change-display').style.display = 'none';
+        document.getElementById('payment-status').textContent = '';
+        document.getElementById('finish-btn').disabled = true;
+        document.getElementById('finish-btn').className = 'w-full bg-gray-400 text-white py-3 rounded-lg font-semibold cursor-not-allowed';
+      }
+
+      function formatPaymentInput(input) {
+        // Remove all non-digit characters
+        let value = input.value.replace(/\D/g, '');
+
+        // Add thousand separators
+        if (value) {
+          value = parseInt(value).toLocaleString('id-ID');
+        }
+
+        input.value = value;
+      }
+
+      function getPaymentValue() {
+        const paymentInput = document.getElementById('payment').value;
+        return parseFloat(paymentInput.replace(/\./g, '')) || 0;
+      }
+
+      function calculateChange() {
+        const total = getCurrentTotal();
+        const payment = getPaymentValue();
+        const change = payment - total;
+
+        const changeDisplay = document.getElementById('change-display');
+        const changeAmount = document.getElementById('change');
+        const paymentStatus = document.getElementById('payment-status');
+        const finishBtn = document.getElementById('finish-btn');
+
+        if (payment === 0) {
+          changeDisplay.style.display = 'none';
+          paymentStatus.textContent = '';
+          finishBtn.disabled = true;
+          finishBtn.className = 'w-full bg-gray-400 text-white py-3 rounded-lg font-semibold cursor-not-allowed';
+        } else if (payment < total) {
+          changeDisplay.style.display = 'none';
+          paymentStatus.textContent = `Uang kurang Rp ${Math.abs(change).toLocaleString()}`;
+          paymentStatus.className = 'text-center text-sm text-red-600 font-medium';
+          finishBtn.disabled = true;
+          finishBtn.className = 'w-full bg-gray-400 text-white py-3 rounded-lg font-semibold cursor-not-allowed';
+        } else {
+          changeDisplay.style.display = 'flex';
+          changeAmount.textContent = `Rp ${change.toLocaleString()}`;
+
+          if (change === 0) {
+            paymentStatus.textContent = 'Uang pas!';
+            paymentStatus.className = 'text-center text-sm text-green-600 font-medium';
+          } else {
+            paymentStatus.textContent = 'Pembayaran valid';
+            paymentStatus.className = 'text-center text-sm text-green-600 font-medium';
+          }
+
+          finishBtn.disabled = false;
+          finishBtn.className = 'w-full gradient-bg text-white py-3 rounded-lg font-semibold hover-scale shadow-lg';
+        }
+      }
+
+      function getCurrentTotal() {
+        const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+        const discountAmount = subtotal * (discount / 100);
+        return Math.round(subtotal - discountAmount);
+      }
+
+      // Transaction
+      function finishTransaction() {
+        if (cart.length === 0) {
+          alert('Keranjang kosong!');
+          return;
+        }
+
+        const total = getCurrentTotal();
+        const payment = getPaymentValue();
+
+        if (payment < total) {
+          alert('Uang bayar tidak mencukupi!');
+          return;
+        }
+
+        const change = payment - total;
+        const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+        // Save transaction
+        const transaction = {
+          id: Date.now(),
+          date: new Date().toISOString(),
+          items: [...cart],
+          subtotal: subtotal,
+          discount: discount,
+          total: total,
+          payment: payment,
+          change: change,
+          paymentMethod: 'cash',
+        };
+
+        transactions.push(transaction);
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+
+        // Reduce stock for sold items
+        cart.forEach((cartItem) => {
+          const menuItem = menuItems.find((m) => m.id === cartItem.id);
+          if (menuItem) {
+            menuItem.stock = Math.max(0, menuItem.stock - cartItem.quantity);
+          }
+        });
+        localStorage.setItem('menuItems', JSON.stringify(menuItems));
+
+        // Show success message
+        alert('Transaksi berhasil diselesaikan!');
+
+        // Clear cart and reset payment after transaction
+        clearCart();
+        document.getElementById('payment').value = '';
+        document.getElementById('change-display').style.display = 'none';
+        document.getElementById('payment-status').textContent = '';
+        document.getElementById('finish-btn').disabled = true;
+        document.getElementById('finish-btn').className = 'w-full bg-gray-400 text-white py-3 rounded-lg font-semibold cursor-not-allowed';
+
+        // Refresh menu display to show updated stock
+        loadMenuItems();
+      }
+
+      function getPaymentMethodName(method) {
+        const methods = {
+          cash: 'Tunai',
+          qris: 'QRIS',
+          transfer: 'Transfer Bank',
+          debit: 'Kartu Debit',
+        };
+        return methods[method] || 'Tunai';
+      }
+
+      function deleteTransaction(transactionId) {
+        if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+          transactions = transactions.filter((t) => t.id !== transactionId);
+          localStorage.setItem('transactions', JSON.stringify(transactions));
+
+          // Refresh reports
+          loadDailyReport();
+          loadMonthlyReport();
+        }
+      }
+
+      function editTransaction(transactionId) {
+        const transaction = transactions.find((t) => t.id === transactionId);
+        if (!transaction) return;
+
+        // Create edit modal
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <h3 class="text-lg font-bold mb-4">Edit Transaksi</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Tanggal & Waktu:</label>
+                                <input type="datetime-local" id="edit-date" value="${new Date(transaction.date).toISOString().slice(0, 16)}" class="w-full px-3 py-2 border rounded">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Diskon (%):</label>
+                                <input type="number" id="edit-discount" value="${transaction.discount}" min="0" max="100" class="w-full px-3 py-2 border rounded" onchange="updateEditTotals()">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-100 p-4 rounded">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-medium">Item Pesanan:</h4>
+                                <button onclick="showAddItemToTransaction()" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">+ Tambah Item</button>
+                            </div>
+                            <div id="edit-items-list" class="space-y-2">
+                                ${transaction.items
+                                  .map(
+                                    (item, index) => `
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border" data-item-index="${index}">
+                                        <div class="flex-1">
+                                            <span class="font-medium">${item.name}</span>
+                                            <div class="text-sm text-gray-600">Rp ${item.price.toLocaleString()} per item</div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="changeEditItemQuantity(${index}, -1)" class="bg-red-500 text-white w-6 h-6 rounded text-sm hover:bg-red-600">-</button>
+                                            <span class="w-8 text-center font-medium" id="edit-qty-${index}">${item.quantity}</span>
+                                            <button onclick="changeEditItemQuantity(${index}, 1)" class="bg-green-500 text-white w-6 h-6 rounded text-sm hover:bg-green-600">+</button>
+                                            <button onclick="removeEditItem(${index})" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 ml-2">Hapus</button>
+                                        </div>
+                                    </div>
+                                `
+                                  )
+                                  .join('')}
+                            </div>
+                            
+                            <div id="add-item-section" class="hidden mt-3 p-3 bg-blue-50 rounded border">
+                                <h5 class="font-medium mb-2">Tambah Item Baru:</h5>
+                                <div class="grid grid-cols-3 gap-2 mb-2">
+                                    <select id="new-item-select" class="px-2 py-1 border rounded text-sm">
+                                        <option value="">Pilih Menu</option>
+                                        ${menuItems.map((item) => `<option value="${item.id}">${item.name} - Rp ${item.price.toLocaleString()}</option>`).join('')}
+                                    </select>
+                                    <input type="number" id="new-item-qty" placeholder="Qty" min="1" value="1" class="px-2 py-1 border rounded text-sm">
+                                    <div class="flex space-x-1">
+                                        <button onclick="addItemToTransaction()" class="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">Tambah</button>
+                                        <button onclick="hideAddItemToTransaction()" class="bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600">Batal</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t mt-3 pt-3">
+                                <div class="flex justify-between text-sm">
+                                    <span>Subtotal:</span>
+                                    <span id="edit-subtotal">Rp ${transaction.subtotal.toLocaleString()}</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span>Diskon:</span>
+                                    <span id="edit-discount-amount">Rp ${((transaction.subtotal * transaction.discount) / 100).toLocaleString()}</span>
+                                </div>
+                                <div class="flex justify-between font-bold">
+                                    <span>Total:</span>
+                                    <span id="edit-total">Rp ${transaction.total.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Uang Bayar:</label>
+                            <input type="text" id="edit-payment" value="${transaction.payment.toLocaleString()}" class="w-full px-3 py-2 border rounded" oninput="formatEditPayment(this)" onchange="updateEditTotals()">
+                            <div id="edit-change-info" class="text-sm mt-1"></div>
+                        </div>
+                        
+                        <div class="flex space-x-3 pt-4">
+                            <button onclick="saveTransactionEdit(${transactionId})" class="flex-1 bg-green-500 text-white py-2 rounded hover:bg-green-600">Simpan</button>
+                            <button onclick="closeEditModal()" class="flex-1 bg-gray-500 text-white py-2 rounded hover:bg-gray-600">Batal</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+        document.body.appendChild(modal);
+
+        // Store current transaction data for editing
+        window.currentEditTransaction = JSON.parse(JSON.stringify(transaction));
+
+        // Update totals initially
+        updateEditTotals();
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) {
+            closeEditModal();
+          }
+        });
+      }
+
+      function formatEditPayment(input) {
+        let value = input.value.replace(/\D/g, '');
+        if (value) {
+          value = parseInt(value).toLocaleString('id-ID');
+        }
+        input.value = value;
+      }
+
+      function showAddItemToTransaction() {
+        document.getElementById('add-item-section').classList.remove('hidden');
+      }
+
+      function hideAddItemToTransaction() {
+        document.getElementById('add-item-section').classList.add('hidden');
+        document.getElementById('new-item-select').value = '';
+        document.getElementById('new-item-qty').value = '1';
+      }
+
+      function addItemToTransaction() {
+        const itemId = parseInt(document.getElementById('new-item-select').value);
+        const quantity = parseInt(document.getElementById('new-item-qty').value) || 1;
+
+        if (!itemId) {
+          alert('Pilih menu terlebih dahulu!');
+          return;
+        }
+
+        const menuItem = menuItems.find((m) => m.id === itemId);
+        if (!menuItem) {
+          alert('Menu tidak ditemukan!');
+          return;
+        }
+
+        // Check if item already exists in current edit transaction
+        const existingItemIndex = window.currentEditTransaction.items.findIndex((item) => item.id === itemId);
+
+        if (existingItemIndex >= 0) {
+          // Add to existing item
+          window.currentEditTransaction.items[existingItemIndex].quantity += quantity;
+        } else {
+          // Add new item
+          window.currentEditTransaction.items.push({
+            id: menuItem.id,
+            name: menuItem.name,
+            price: menuItem.price,
+            quantity: quantity,
+          });
+        }
+
+        // Refresh the items list
+        refreshEditItemsList();
+        updateEditTotals();
+        hideAddItemToTransaction();
+      }
+
+      function changeEditItemQuantity(itemIndex, change) {
+        if (!window.currentEditTransaction.items[itemIndex]) return;
+
+        window.currentEditTransaction.items[itemIndex].quantity += change;
+
+        if (window.currentEditTransaction.items[itemIndex].quantity <= 0) {
+          window.currentEditTransaction.items.splice(itemIndex, 1);
+          refreshEditItemsList();
+        } else {
+          document.getElementById(`edit-qty-${itemIndex}`).textContent = window.currentEditTransaction.items[itemIndex].quantity;
+        }
+
+        updateEditTotals();
+      }
+
+      function removeEditItem(itemIndex) {
+        if (confirm('Hapus item ini dari transaksi?')) {
+          window.currentEditTransaction.items.splice(itemIndex, 1);
+          refreshEditItemsList();
+          updateEditTotals();
+        }
+      }
+
+      function refreshEditItemsList() {
+        const itemsList = document.getElementById('edit-items-list');
+        itemsList.innerHTML = window.currentEditTransaction.items
+          .map(
+            (item, index) => `
+                <div class="flex justify-between items-center bg-white p-2 rounded border" data-item-index="${index}">
+                    <div class="flex-1">
+                        <span class="font-medium">${item.name}</span>
+                        <div class="text-sm text-gray-600">Rp ${item.price.toLocaleString()} per item</div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeEditItemQuantity(${index}, -1)" class="bg-red-500 text-white w-6 h-6 rounded text-sm hover:bg-red-600">-</button>
+                        <span class="w-8 text-center font-medium" id="edit-qty-${index}">${item.quantity}</span>
+                        <button onclick="changeEditItemQuantity(${index}, 1)" class="bg-green-500 text-white w-6 h-6 rounded text-sm hover:bg-green-600">+</button>
+                        <button onclick="removeEditItem(${index})" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 ml-2">Hapus</button>
+                    </div>
+                </div>
+            `
+          )
+          .join('');
+      }
+
+      function updateEditTotals() {
+        if (!window.currentEditTransaction) return;
+
+        // Calculate new subtotal from current items
+        const subtotal = window.currentEditTransaction.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const discount = parseFloat(document.getElementById('edit-discount').value) || 0;
+        const discountAmount = subtotal * (discount / 100);
+        const total = Math.round(subtotal - discountAmount);
+
+        // Update display
+        document.getElementById('edit-subtotal').textContent = `Rp ${subtotal.toLocaleString()}`;
+        document.getElementById('edit-discount-amount').textContent = `Rp ${Math.round(discountAmount).toLocaleString()}`;
+        document.getElementById('edit-total').textContent = `Rp ${total.toLocaleString()}`;
+
+        // Update payment validation
+        const payment = parseFloat(document.getElementById('edit-payment').value.replace(/\./g, '')) || 0;
+        const change = payment - total;
+        const changeInfo = document.getElementById('edit-change-info');
+
+        if (payment === 0) {
+          changeInfo.textContent = '';
+          changeInfo.className = 'text-sm mt-1';
+        } else if (payment < total) {
+          changeInfo.textContent = `Uang kurang Rp ${Math.abs(change).toLocaleString()}`;
+          changeInfo.className = 'text-sm mt-1 text-red-600 font-medium';
+        } else {
+          changeInfo.textContent = change === 0 ? 'Uang pas!' : `Kembalian: Rp ${change.toLocaleString()}`;
+          changeInfo.className = 'text-sm mt-1 text-green-600 font-medium';
+        }
+
+        // Update current transaction data
+        window.currentEditTransaction.subtotal = subtotal;
+        window.currentEditTransaction.discount = discount;
+        window.currentEditTransaction.total = total;
+      }
+
+      function saveTransactionEdit(transactionId) {
+        const transaction = transactions.find((t) => t.id === transactionId);
+        if (!transaction) return;
+
+        if (!window.currentEditTransaction.items.length) {
+          alert('Transaksi harus memiliki minimal 1 item!');
+          return;
+        }
+
+        const newDate = document.getElementById('edit-date').value;
+        const newPayment = parseFloat(document.getElementById('edit-payment').value.replace(/\./g, '')) || 0;
+
+        const subtotal = window.currentEditTransaction.subtotal;
+        const total = window.currentEditTransaction.total;
+        const change = newPayment - total;
+
+        if (newPayment < total) {
+          alert('Uang bayar tidak mencukupi untuk total yang baru!');
+          return;
+        }
+
+        // Update transaction with new data
+        transaction.date = new Date(newDate).toISOString();
+        transaction.items = [...window.currentEditTransaction.items];
+        transaction.subtotal = subtotal;
+        transaction.discount = window.currentEditTransaction.discount;
+        transaction.total = total;
+        transaction.payment = newPayment;
+        transaction.change = change;
+
+        // Save to localStorage
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+
+        // Clean up
+        window.currentEditTransaction = null;
+
+        // Close modal and refresh reports
+        closeEditModal();
+        loadDailyReport();
+        loadMonthlyReport();
+
+        alert('Transaksi berhasil diperbarui!');
+      }
+
+      function closeEditModal() {
+        const modal = document.querySelector('.fixed.inset-0');
+        if (modal) {
+          modal.remove();
+        }
+        // Clean up global variable
+        window.currentEditTransaction = null;
+      }
+
+      // Reports
+      function loadDailyReport() {
+        const selectedDate = document.getElementById('daily-date').value;
+        const dailyTransactions = transactions.filter((t) => new Date(t.date).toISOString().split('T')[0] === selectedDate);
+
+        const dailyReport = document.getElementById('daily-report');
+
+        if (dailyTransactions.length === 0) {
+          dailyReport.innerHTML = '<p class="text-gray-500 text-center py-8">Tidak ada transaksi pada tanggal ini</p>';
+          return;
+        }
+
+        const totalRevenue = dailyTransactions.reduce((sum, t) => sum + t.total, 0);
+        const totalTransactions = dailyTransactions.length;
+
+        dailyReport.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-800">Total Pendapatan</h4>
+                        <p class="text-2xl font-bold text-green-600">Rp ${totalRevenue.toLocaleString()}</p>
+                    </div>
+                    <div class="bg-blue-100 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-800">Total Transaksi</h4>
+                        <p class="text-2xl font-bold text-blue-600">${totalTransactions}</p>
+                    </div>
+                    <div class="bg-orange-100 p-4 rounded-lg">
+                        <h4 class="font-semibold text-orange-800">Rata-rata per Transaksi</h4>
+                        <p class="text-2xl font-bold text-orange-600">Rp ${Math.round(totalRevenue / totalTransactions).toLocaleString()}</p>
+                    </div>
+                    
+                    <div class="bg-white border rounded-lg p-4">
+                        <h5 class="font-semibold mb-3">Detail Transaksi:</h5>
+                        <div class="max-h-60 overflow-y-auto space-y-2">
+                            ${dailyTransactions
+                              .map(
+                                (transaction) => `
+                                <div class="flex justify-between items-center bg-gray-50 p-3 rounded border">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">${new Date(transaction.date).toLocaleTimeString('id-ID')}</p>
+                                        <p class="text-xs text-gray-600">${transaction.items.length} item - ${transaction.paymentMethod || 'Tunai'}</p>
+                                        <p class="text-sm font-bold text-green-600">Rp ${transaction.total.toLocaleString()}</p>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button onclick="editTransaction(${transaction.id})" class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 transition-colors">Edit</button>
+                                        <button onclick="deleteTransaction(${transaction.id})" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 transition-colors">Hapus</button>
+                                    </div>
+                                </div>
+                            `
+                              )
+                              .join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+
+      function loadMonthlyReport() {
+        const selectedMonth = document.getElementById('monthly-date').value;
+        const monthlyTransactions = transactions.filter((t) => new Date(t.date).toISOString().slice(0, 7) === selectedMonth);
+
+        const monthlyReport = document.getElementById('monthly-report');
+
+        if (monthlyTransactions.length === 0) {
+          monthlyReport.innerHTML = '<p class="text-gray-500 text-center py-8">Tidak ada transaksi pada bulan ini</p>';
+          return;
+        }
+
+        const totalRevenue = monthlyTransactions.reduce((sum, t) => sum + t.total, 0);
+        const totalTransactions = monthlyTransactions.length;
+
+        // Group by date for daily breakdown
+        const dailyBreakdown = {};
+        monthlyTransactions.forEach((t) => {
+          const date = new Date(t.date).toISOString().split('T')[0];
+          if (!dailyBreakdown[date]) {
+            dailyBreakdown[date] = { count: 0, revenue: 0 };
+          }
+          dailyBreakdown[date].count += 1;
+          dailyBreakdown[date].revenue += t.total;
+        });
+
+        monthlyReport.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-800">Total Pendapatan Bulan</h4>
+                        <p class="text-2xl font-bold text-green-600">Rp ${totalRevenue.toLocaleString()}</p>
+                    </div>
+                    <div class="bg-blue-100 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-800">Total Transaksi Bulan</h4>
+                        <p class="text-2xl font-bold text-blue-600">${totalTransactions}</p>
+                    </div>
+                    <div class="max-h-40 overflow-y-auto">
+                        <h5 class="font-semibold mb-2">Rincian Harian:</h5>
+                        ${Object.entries(dailyBreakdown)
+                          .map(
+                            ([date, data]) => `
+                            <div class="flex justify-between text-sm py-1 border-b">
+                                <span>${new Date(date).toLocaleDateString('id-ID')}</span>
+                                <span>${data.count} transaksi - Rp ${data.revenue.toLocaleString()}</span>
+                            </div>
+                        `
+                          )
+                          .join('')}
+                    </div>
+                </div>
+            `;
+      }
+
+      // Reset Functions
+      function resetDailyReport() {
+        const selectedDate = document.getElementById('daily-date').value;
+        if (!selectedDate) {
+          alert('Pilih tanggal terlebih dahulu!');
+          return;
+        }
+
+        if (confirm(`Apakah Anda yakin ingin menghapus SEMUA transaksi pada tanggal ${new Date(selectedDate).toLocaleDateString('id-ID')}?\n\nTindakan ini tidak dapat dibatalkan!`)) {
+          // Filter out transactions from selected date
+          transactions = transactions.filter((t) => new Date(t.date).toISOString().split('T')[0] !== selectedDate);
+
+          // Save to localStorage
+          localStorage.setItem('transactions', JSON.stringify(transactions));
+
+          // Refresh reports
+          loadDailyReport();
+          loadMonthlyReport();
+
+          alert('Data transaksi harian berhasil dihapus!');
+        }
+      }
+
+      function resetMonthlyReport() {
+        const selectedMonth = document.getElementById('monthly-date').value;
+        if (!selectedMonth) {
+          alert('Pilih bulan terlebih dahulu!');
+          return;
+        }
+
+        const monthName = new Date(selectedMonth + '-01').toLocaleDateString('id-ID', { year: 'numeric', month: 'long' });
+
+        if (confirm(`Apakah Anda yakin ingin menghapus SEMUA transaksi pada bulan ${monthName}?\n\nTindakan ini tidak dapat dibatalkan!`)) {
+          // Filter out transactions from selected month
+          transactions = transactions.filter((t) => new Date(t.date).toISOString().slice(0, 7) !== selectedMonth);
+
+          // Save to localStorage
+          localStorage.setItem('transactions', JSON.stringify(transactions));
+
+          // Refresh reports
+          loadDailyReport();
+          loadMonthlyReport();
+
+          alert('Data transaksi bulanan berhasil dihapus!');
+        }
+      }
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', function () {
+        showPage('kasir');
+      });
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement('script');
+            d.innerHTML =
+              "window.__CF$cv$params={r:'97c7c28910349f89',t:'MTc1NzQzMjE3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName('head')[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement('iframe');
+          a.height = 1;
+          a.width = 1;
+          a.style.position = 'absolute';
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = 'none';
+          a.style.visibility = 'hidden';
+          document.body.appendChild(a);
+          if ('loading' !== document.readyState) c();
+          else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              'loading' !== document.readyState && ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
